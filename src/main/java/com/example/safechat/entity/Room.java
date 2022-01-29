@@ -40,4 +40,9 @@ public class Room {
         userPresenceList.add(presence);
         return userPresenceList;
     }
+
+    public List<UserPresence> addPresencesToUserPresenceList(List<UserPresence> presences) {
+        userPresenceList.addAll(presences);
+        return userPresenceList;
+    }
 }

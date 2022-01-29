@@ -26,4 +26,15 @@ public class UserPresence {
     private LocalDateTime joinDate;
 
     private ERole role;
+
+    public UserPresence() { }
+    public UserPresence(Long userId,
+                        Long roomId,
+                        LocalDateTime joinDate,
+                        ERole role) {
+        this.userId = userId;
+        this.roomId = roomId;
+        this.joinDate = joinDate;
+        this.role = role;
+    }
 }

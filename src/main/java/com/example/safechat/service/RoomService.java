@@ -66,12 +66,27 @@ public class RoomService {
         Room room = roomRepository.getById(roomId);
         Optional<List<UserPresence>> presences = userPresenceRepository.findAllByRoom(roomId);
         roomRepository.delete(room);
-        presences.ifPresent((userPresences -> {
-            for (UserPresence presence:
-                 userPresences) {
-                userPresenceRepository.delete(presence);
-            }
-        }));
+        presences.ifPresent((userPresenceRepository::deleteAll));
+    }
+
+    public Room addUsersToRoom(List<Long> userIds, Long roomId) {
+        LocalDateTime joinDate = LocalDateTime.now();
+        List<UserPresence> presences = new ArrayList<>();
+        for (Long userId:
+             userIds) {
+            UserPresence presence = new UserPresence(userId,
+                    roomId,
+                    joinDate,
+                    ERole.ROLE_USER);
+            presences.add(presence);
+            User user = userRepository.getById(userId);
+            user.getUserPresenceList().add(presence);
+            userRepository.save(user);
+        }
+        userPresenceRepository.saveAll(presences);
+        Room room = roomRepository.getById(roomId);
+        room.addPresencesToUserPresenceList(presences);
+        return room;
     }
 
     //vulnerability: can drop when one room is being deleted while querying others
