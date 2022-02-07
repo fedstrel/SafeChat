@@ -51,8 +51,8 @@ public class RoomService {
 
         //connecting a room to other entities in the database
         UserPresence presence = new UserPresence();
-        presence.setRoomId(room.getId());
-        presence.setUserId(userId);
+        presence.setRoom(room);
+        presence.setUser(userRepository.getById(userId));
         presence.setRole(ERole.ROLE_ADMIN);
         presence.setJoinDate(room.getCreateDate());
         userPresenceRepository.save(presence);
@@ -64,7 +64,7 @@ public class RoomService {
 
     public void deleteRoom(Long roomId) {
         Room room = roomRepository.getById(roomId);
-        Optional<List<UserPresence>> presences = userPresenceRepository.findAllByRoom(roomId);
+        Optional<List<UserPresence>> presences = userPresenceRepository.findAllByRoomId(roomId);
         roomRepository.delete(room);
         presences.ifPresent((userPresenceRepository::deleteAll));
     }
@@ -74,10 +74,10 @@ public class RoomService {
         List<UserPresence> presences = new ArrayList<>();
         for (Long userId:
              userIds) {
-            UserPresence presence = new UserPresence(userId,
-                    roomId,
-                    joinDate,
-                    ERole.ROLE_USER);
+            UserPresence presence = new UserPresence(joinDate,
+                    ERole.ROLE_USER,
+                    userRepository.getById(userId),
+                    roomRepository.getById(roomId));
             presences.add(presence);
             User user = userRepository.getById(userId);
             user.getUserPresenceList().add(presence);
@@ -91,12 +91,12 @@ public class RoomService {
 
     //vulnerability: can drop when one room is being deleted while querying others
     public List<Room> getAllRoomsForUser(Long userId) {
-        List<UserPresence> presences = userPresenceRepository.findAllByUser(userId)
+        List<UserPresence> presences = userPresenceRepository.findAllByUserId(userId)
                 .orElseThrow(() -> new PresenceNotFoundException("Presence not found."));
         List<Room> rooms = new ArrayList<>();
         for (UserPresence presence:
                 presences) {
-            rooms.add(roomRepository.getById(presence.getUserId()));
+            rooms.add(roomRepository.getById(presence.getUser().getId()));
         }
         return rooms;
     }

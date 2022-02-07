@@ -10,6 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface IUserPresenceRepository extends JpaRepository<UserPresence, UserPresenceId> {
-    Optional<List<UserPresence>> findAllByUser(Long userId);
-    Optional<List<UserPresence>> findAllByRoom(Long roomId);
+    Optional<List<UserPresence>> findAllByUserId(Long userId);
+    Optional<List<UserPresence>> findAllByRoomId(Long roomId);
 }

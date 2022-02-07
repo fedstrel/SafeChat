@@ -5,10 +5,7 @@ import com.example.safechat.entity.enums.ERole;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -16,10 +13,8 @@ import java.time.LocalDateTime;
 @IdClass(UserPresenceId.class)
 public class UserPresence {
     @Id
-    private Long userId;
-
-    @Id
-    private Long roomId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long userPresenceId;
 
     @Column(updatable = false)
     @JsonFormat(pattern = "yyyy-mm-dd HH:mm:s")
@@ -27,13 +22,19 @@ public class UserPresence {
 
     private ERole role;
 
+    @ManyToOne
+    private User user;
+
+    @ManyToOne
+    private Room room;
+
     public UserPresence() { }
-    public UserPresence(Long userId,
-                        Long roomId,
-                        LocalDateTime joinDate,
-                        ERole role) {
-        this.userId = userId;
-        this.roomId = roomId;
+    public UserPresence(LocalDateTime joinDate,
+                        ERole role,
+                        User user,
+                        Room room) {
+        this.user = user;
+        this.room = room;
         this.joinDate = joinDate;
         this.role = role;
     }
