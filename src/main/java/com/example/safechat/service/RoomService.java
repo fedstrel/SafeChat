@@ -6,6 +6,7 @@ import com.example.safechat.entity.User;
 import com.example.safechat.entity.UserPresence;
 import com.example.safechat.entity.enums.ERole;
 import com.example.safechat.exception.PresenceNotFoundException;
+import com.example.safechat.exception.RoomNotFoundException;
 import com.example.safechat.repository.IRoomRepository;
 import com.example.safechat.repository.IUserPresenceRepository;
 import com.example.safechat.repository.IUserRepository;
@@ -32,6 +33,10 @@ public class RoomService {
         this.userPresenceRepository = userPresenceRepository;
     }
 
+    public Room getRoomById(Long roomId) {
+        return roomRepository.findById(roomId).orElseThrow(() -> new RoomNotFoundException("Room not found"));
+    }
+
     public Room createRoom(Long userId, RoomDTO dto) {
         //creating an instance of a room
         Room room = new Room();
@@ -40,14 +45,6 @@ public class RoomService {
         room.setRoomType(dto.getRoomType());
         room.setCreateDate(LocalDateTime.now());
         room = roomRepository.save(room);
-        /*
-        Вопрос: я читал что JPARepository работают с Unit of Work,
-        то есть чтобы в последствии обновить созданную комнату,
-        мне надо бы получить ее через поиск, чтобы она начала отслеживаться
-        контекстом. Достаточно ли вышеприведенного присваивания, чтобы контекст начал
-        отслеживать сущность или необходимо будет сделать вот такое присваивание:
-        room = roomRepository.getById(roomRepository.save(room).getId())?
-        */
 
         //connecting a room to other entities in the database
         UserPresence presence = new UserPresence();

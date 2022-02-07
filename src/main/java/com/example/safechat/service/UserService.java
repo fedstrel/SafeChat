@@ -3,6 +3,7 @@ package com.example.safechat.service;
 import com.example.safechat.entity.User;
 import com.example.safechat.entity.UserPresence;
 import com.example.safechat.exception.PresenceNotFoundException;
+import com.example.safechat.exception.UserNotFoundException;
 import com.example.safechat.repository.IMessageRepository;
 import com.example.safechat.repository.IUserPresenceRepository;
 import com.example.safechat.repository.IUserRepository;
@@ -25,6 +26,10 @@ public class UserService {
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
         this.userPresenceRepository = userPresenceRepository;
+    }
+
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found."));
     }
 
     public List<User> getAllUsersForRoom(Long roomId) {

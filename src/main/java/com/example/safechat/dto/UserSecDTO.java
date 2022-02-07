@@ -1,7 +1,10 @@
 package com.example.safechat.dto;
 
+import lombok.Data;
+
 import javax.validation.constraints.NotEmpty;
 
+@Data
 public class UserSecDTO {
     private Long id;
     @NotEmpty
