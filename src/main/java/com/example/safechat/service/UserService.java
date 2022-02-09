@@ -28,6 +28,11 @@ public class UserService {
         this.userPresenceRepository = userPresenceRepository;
     }
 
+    public void deleteUser(Long userId) {
+        User user = userRepository.getById(userId);
+        userRepository.delete(user);
+    }
+
     public User getUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found."));
     }

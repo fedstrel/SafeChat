@@ -86,6 +86,20 @@ public class RoomService {
         return room;
     }
 
+    public Room deleteUsersFromRoom(List<Long> userIds, Long roomId) {
+        Room room = roomRepository.getById(roomId);
+        List<UserPresence> presences = room.getUserPresenceList();
+        for (Long userId:
+             userIds) {
+            UserPresence presence = userPresenceRepository.findByRoomIdAndUserId(roomId, userId)
+                    .orElseThrow(() -> new PresenceNotFoundException("UserPresence for user with id=" + userId + "not found."));
+             userPresenceRepository.delete(presence);
+            presences.remove(presence);
+        }
+        roomRepository.save(room);
+        return room;
+    }
+
     //vulnerability: can drop when one room is being deleted while querying others
     public List<Room> getAllRoomsForUser(Long userId) {
         List<UserPresence> presences = userPresenceRepository.findAllByUserId(userId)
