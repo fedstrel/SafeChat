@@ -124,5 +124,8 @@ public class RoomService {
         return resRooms;
     }
 
-    //wait for sensei's answer and add getAllRoomsContainingName(String name) { }
+   public List<Room> getAllRoomsContainingName(String name) {
+        return roomRepository.findAllContainingName(name)
+                .orElseThrow(() -> new RoomNotFoundException("Room not found."));
+   }
 }

@@ -22,6 +22,15 @@ public class RoomController {
     @Autowired
     private RoomFacade roomFacade;
 
+    @GetMapping("/search")
+    public ResponseEntity<List<RoomDTO>> getAllRoomsContainingName(@RequestBody String name) {
+        List<RoomDTO> roomDTOList = roomService.getAllRoomsContainingName(name)
+                .stream()
+                .map(roomFacade::roomToRoomDTO)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(roomDTOList, HttpStatus.OK);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<RoomDTO> getRoomById(@PathVariable Long id) {
         return new ResponseEntity<>(roomFacade.roomToRoomDTO(roomService.getRoomById(id)), HttpStatus.OK);
