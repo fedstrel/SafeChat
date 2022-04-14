@@ -1,7 +1,6 @@
 package com.example.safechat.repository;
 
 import com.example.safechat.entity.Message;
-import com.example.safechat.entity.compoundkey.UserPresenceId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

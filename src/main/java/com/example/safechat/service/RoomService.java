@@ -4,7 +4,7 @@ import com.example.safechat.dto.RoomDTO;
 import com.example.safechat.entity.Room;
 import com.example.safechat.entity.User;
 import com.example.safechat.entity.UserPresence;
-import com.example.safechat.entity.enums.ERole;
+import com.example.safechat.entity.enums.ERoomRole;
 import com.example.safechat.exception.PresenceNotFoundException;
 import com.example.safechat.exception.RoomNotFoundException;
 import com.example.safechat.repository.IRoomRepository;
@@ -50,7 +50,7 @@ public class RoomService {
         UserPresence presence = new UserPresence();
         presence.setRoom(room);
         presence.setUser(userRepository.getById(userId));
-        presence.setRole(ERole.ROLE_ADMIN);
+        presence.setRole(ERoomRole.ROOM_ROLE_ADMIN);
         presence.setJoinDate(room.getCreateDate());
         userPresenceRepository.save(presence);
 
@@ -72,7 +72,7 @@ public class RoomService {
         for (Long userId:
              userIds) {
             UserPresence presence = new UserPresence(joinDate,
-                    ERole.ROLE_USER,
+                    ERoomRole.ROOM_ROLE_USER,
                     userRepository.getById(userId),
                     roomRepository.getById(roomId));
             presences.add(presence);

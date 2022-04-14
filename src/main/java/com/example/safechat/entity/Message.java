@@ -10,6 +10,7 @@ import java.util.List;
 
 @Entity
 @Data
+@Table(name="messages")
 public class Message {
     @Id
     private Long id;

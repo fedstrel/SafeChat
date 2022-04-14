@@ -15,6 +15,7 @@ import java.util.Set;
 
 @Data
 @Entity
+@Table(name="rooms")
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,5 +1,6 @@
 package com.example.safechat.dto;
 
+import com.example.safechat.entity.enums.ERole;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
@@ -17,5 +18,7 @@ public class UserSecDTO {
     private String password;
     @NotEmpty
     private String email;
+    @NotEmpty
+    private ERole role;
     private String info;
 }

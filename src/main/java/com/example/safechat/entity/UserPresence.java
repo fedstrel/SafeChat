@@ -1,7 +1,6 @@
 package com.example.safechat.entity;
 
-import com.example.safechat.entity.compoundkey.UserPresenceId;
-import com.example.safechat.entity.enums.ERole;
+import com.example.safechat.entity.enums.ERoomRole;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
@@ -10,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
-@IdClass(UserPresenceId.class)
+@Table(name="user_presence")
 public class UserPresence {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,7 +19,7 @@ public class UserPresence {
     @JsonFormat(pattern = "yyyy-mm-dd HH:mm:s")
     private LocalDateTime joinDate;
 
-    private ERole role;
+    private ERoomRole role;
 
     @ManyToOne
     private User user;
@@ -30,7 +29,7 @@ public class UserPresence {
 
     public UserPresence() { }
     public UserPresence(LocalDateTime joinDate,
-                        ERole role,
+                        ERoomRole role,
                         User user,
                         Room room) {
         this.user = user;

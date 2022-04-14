@@ -1,13 +1,16 @@
 package com.example.safechat.service;
 
+import com.example.safechat.dto.UserSecDTO;
 import com.example.safechat.entity.User;
 import com.example.safechat.entity.UserPresence;
 import com.example.safechat.exception.PresenceNotFoundException;
 import com.example.safechat.exception.UserNotFoundException;
+import com.example.safechat.payload.request.SignupRequest;
 import com.example.safechat.repository.IMessageRepository;
 import com.example.safechat.repository.IUserPresenceRepository;
 import com.example.safechat.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,14 +21,42 @@ public class UserService {
     private final IMessageRepository messageRepository;
     private final IUserRepository userRepository;
     private final IUserPresenceRepository userPresenceRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
     public UserService(IMessageRepository messageRepository,
                        IUserRepository userRepository,
-                       IUserPresenceRepository userPresenceRepository) {
+                       IUserPresenceRepository userPresenceRepository,
+                       BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
         this.userPresenceRepository = userPresenceRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
+
+    public User createUser(SignupRequest signupRequestRequest) {
+        User user = new User();
+        user.setEmail(signupRequestRequest.getEmail());
+        user.setFirstname(signupRequestRequest.getFirstname());
+        user.setLastname(signupRequestRequest.getLastname());
+        user.setUsername(signupRequestRequest.getUsername());
+        user.setPassword(bCryptPasswordEncoder.encode(signupRequestRequest.getPassword()));
+        return user;
+    }
+
+    public User updateUser(UserSecDTO userSecDTO) {
+        User user = userRepository.findUserById(userSecDTO.getId())
+                .orElseThrow(() -> new UserNotFoundException("User not found."));
+
+        user.setId(userSecDTO.getId());
+        user.setFirstname(userSecDTO.getFirstname());
+        user.setLastname(userSecDTO.getLastname());
+        user.setEmail(userSecDTO.getEmail());
+        user.setUsername(userSecDTO.getUsername());
+        user.setPassword(userSecDTO.getPassword());
+        user.setRole(userSecDTO.getRole());
+
+        return userRepository.save(user);
     }
 
     public void deleteUser(Long userId) {

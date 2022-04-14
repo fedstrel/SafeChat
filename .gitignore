@@ -29,5 +29,9 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+### Security stuff ###
+/application.properties
+/SecurityConstants
+
 ### VS Code ###
 .vscode/
