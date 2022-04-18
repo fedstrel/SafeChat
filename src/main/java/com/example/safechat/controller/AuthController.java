@@ -1,5 +1,6 @@
 package com.example.safechat.controller;
 
+import com.example.safechat.exception.UserAlreadyExistsException;
 import com.example.safechat.payload.request.LoginRequest;
 import com.example.safechat.payload.request.SignupRequest;
 import com.example.safechat.payload.response.JWTSuccessResponse;
@@ -18,14 +19,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 @AllArgsConstructor
+@CrossOrigin
 @RestController
 @RequestMapping("/auth")
 @PreAuthorize("permitAll()")
@@ -45,22 +44,31 @@ public class AuthController {
         if (!ObjectUtils.isEmpty(listErrors))
             return listErrors;
 
-        userService.createUser(signupRequest);
+        try {
+            userService.createUser(signupRequest);
+        } catch (UserAlreadyExistsException e) {
+            return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
+        }
         return ResponseEntity.ok(new MessageResponse("Registration successfully completed"));
     }
 
-    @PostMapping("/signIn")
+    @PostMapping("/signin")
     public ResponseEntity<Object> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, BindingResult bindingResult) {
         ResponseEntity<Object> listErrors = responseErrorValidator.mappedValidatorService(bindingResult);
         if (!ObjectUtils.isEmpty(listErrors))
             return listErrors;
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = SecurityConstants.TOKEN_PREFIX + jwtProvider.generateToken(authentication);
 
         return ResponseEntity.ok(new JWTSuccessResponse(true, jwt));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
+        }
     }
 }

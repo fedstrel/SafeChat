@@ -1,6 +1,6 @@
 package com.example.safechat.annotation;
 
-import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
+import com.example.safechat.validator.EmailValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

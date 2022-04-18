@@ -3,7 +3,9 @@ package com.example.safechat.service;
 import com.example.safechat.dto.UserSecDTO;
 import com.example.safechat.entity.User;
 import com.example.safechat.entity.UserPresence;
+import com.example.safechat.entity.enums.ERole;
 import com.example.safechat.exception.PresenceNotFoundException;
+import com.example.safechat.exception.UserAlreadyExistsException;
 import com.example.safechat.exception.UserNotFoundException;
 import com.example.safechat.payload.request.SignupRequest;
 import com.example.safechat.repository.IMessageRepository;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,13 +38,16 @@ public class UserService {
     }
 
     public User createUser(SignupRequest signupRequestRequest) {
+        if (userRepository.findUserByUsername(signupRequestRequest.getUsername()).isPresent())
+            throw new UserAlreadyExistsException("Entered username is already in use");
         User user = new User();
         user.setEmail(signupRequestRequest.getEmail());
         user.setFirstname(signupRequestRequest.getFirstname());
         user.setLastname(signupRequestRequest.getLastname());
         user.setUsername(signupRequestRequest.getUsername());
         user.setPassword(bCryptPasswordEncoder.encode(signupRequestRequest.getPassword()));
-        return user;
+        user.setRole(ERole.ROLE_USER);
+        return userRepository.save(user);
     }
 
     public User updateUser(UserSecDTO userSecDTO) {
@@ -55,7 +61,7 @@ public class UserService {
         user.setUsername(userSecDTO.getUsername());
         user.setPassword(userSecDTO.getPassword());
         user.setRole(userSecDTO.getRole());
-
+        user.setCreateDate(LocalDateTime.now());
         return userRepository.save(user);
     }
 

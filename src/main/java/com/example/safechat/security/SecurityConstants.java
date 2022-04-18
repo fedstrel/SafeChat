@@ -1,7 +1,7 @@
 package com.example.safechat.security;
 
 public class SecurityConstants {
-    public static final String SIGN_UP_URLS = "/api/auth/**";
+    public static final String SIGN_UP_URLS = "/auth/**";
     public static final String SECRET_KEY = "napas";
     public static final String TOKEN_PREFIX = "Bearer ";
     public static final String HEADER_STRING = "Authorization";
