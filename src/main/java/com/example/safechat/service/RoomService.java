@@ -59,11 +59,14 @@ public class RoomService {
         return roomRepository.save(room);
     }
 
-    public void deleteRoom(Long roomId) {
+    public boolean deleteRoom(Long roomId, Long userId) {
+        if (isUserAdminOfRoom(userId, roomId))
+            return false;
         Room room = roomRepository.getById(roomId);
         Optional<List<UserPresence>> presences = userPresenceRepository.findAllByRoomId(roomId);
         roomRepository.delete(room);
         presences.ifPresent((userPresenceRepository::deleteAll));
+        return true;
     }
 
     public Room addUsersToRoom(List<Long> userIds, Long roomId) {
@@ -86,7 +89,9 @@ public class RoomService {
         return room;
     }
 
-    public Room deleteUsersFromRoom(List<Long> userIds, Long roomId) {
+    public Room deleteUsersFromRoom(List<Long> userIds, Long roomId, Long userAuthorId) {
+        if (isUserAdminOfRoom(userAuthorId, roomId))
+            return null;
         Room room = roomRepository.getById(roomId);
         List<UserPresence> presences = room.getUserPresenceList();
         for (Long userId:
@@ -127,5 +132,10 @@ public class RoomService {
    public List<Room> getAllRoomsContainingName(String name) {
         return roomRepository.findAllContainingName(name)
                 .orElseThrow(() -> new RoomNotFoundException("Room not found."));
+   }
+
+   private boolean isUserAdminOfRoom(Long userId, Long roomId) {
+       Optional<UserPresence> userAuthorPresence = userPresenceRepository.findByRoomIdAndUserId(roomId, userId);
+       return userAuthorPresence.isEmpty() || userAuthorPresence.get().getRole() != ERoomRole.ROOM_ROLE_ADMIN;
    }
 }

@@ -3,6 +3,7 @@ package com.example.safechat.controller;
 import com.example.safechat.dto.RoomDTO;
 import com.example.safechat.entity.Room;
 import com.example.safechat.facade.RoomFacade;
+import com.example.safechat.payload.response.MessageResponse;
 import com.example.safechat.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,8 +23,8 @@ public class RoomController {
     @Autowired
     private RoomFacade roomFacade;
 
-    @GetMapping("/search")
-    public ResponseEntity<List<RoomDTO>> getAllRoomsContainingName(@RequestBody String name) {
+    @GetMapping("/search={name}")
+    public ResponseEntity<List<RoomDTO>> getAllRoomsContainingName(@PathVariable String name) {
         List<RoomDTO> roomDTOList = roomService.getAllRoomsContainingName(name)
                 .stream()
                 .map(roomFacade::roomToRoomDTO)
@@ -36,9 +37,9 @@ public class RoomController {
         return new ResponseEntity<>(roomFacade.roomToRoomDTO(roomService.getRoomById(id)), HttpStatus.OK);
     }
 
-    @GetMapping("/user/search/{userId}")
-    public ResponseEntity<List<RoomDTO>> getAllRoomsByUserIdAndText(@PathVariable Long userId, @RequestBody String text) {
-        List<RoomDTO> roomDTOList = roomService.getAllRoomsByUserContainingName(userId, text)
+    @GetMapping("/search={name}/{userId}")
+    public ResponseEntity<List<RoomDTO>> getAllRoomsByUserIdAndName(@PathVariable Long userId, @PathVariable String name) {
+        List<RoomDTO> roomDTOList = roomService.getAllRoomsByUserContainingName(userId, name)
                 .stream()
                 .map(roomFacade::roomToRoomDTO)
                 .collect(Collectors.toList());
@@ -54,10 +55,12 @@ public class RoomController {
         return new ResponseEntity<>(roomDTOList, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}/user/{userId}")
     @ResponseStatus(value = HttpStatus.OK)
-    public void deleteRoom(@PathVariable Long id) {
-        roomService.deleteRoom(id);
+    public ResponseEntity<MessageResponse> deleteRoom(@PathVariable Long id, @PathVariable Long userId) {
+        if (roomService.deleteRoom(id, userId))
+            return new ResponseEntity<>(new MessageResponse("Room deleted"), HttpStatus.OK);
+        return new ResponseEntity<>(new MessageResponse("Not enough rights to delete room"), HttpStatus.UNAUTHORIZED);
     }
 
     @PostMapping("/create/{userId}")
@@ -71,8 +74,13 @@ public class RoomController {
         return new ResponseEntity<>(roomFacade.roomToRoomDTO(roomService.addUsersToRoom(userIds, id)), HttpStatus.OK);
     }
 
-    @PostMapping("/delete/{id}")
-    public ResponseEntity<RoomDTO> deleteUsersFromRoom(@RequestBody List<Long> userIds, @PathVariable Long id) {
-        return new ResponseEntity<>(roomFacade.roomToRoomDTO(roomService.deleteUsersFromRoom(userIds, id)), HttpStatus.OK);
+    @PostMapping("/delete/{id}/user/{userId}")
+    public ResponseEntity<RoomDTO> deleteUsersFromRoom(@RequestBody List<Long> userIds,
+                                                       @PathVariable Long id,
+                                                       @PathVariable Long userId) {
+        Room room = roomService.deleteUsersFromRoom(userIds, id, userId);
+        if (room == null)
+            return new ResponseEntity<>(new RoomDTO(), HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(roomFacade.roomToRoomDTO(room), HttpStatus.OK);
     }
 }

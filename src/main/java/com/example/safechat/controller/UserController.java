@@ -53,8 +53,9 @@ public class UserController {
     public ResponseEntity<MessageResponse> deleteUser(@PathVariable Long userId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ADMIN"))) {
-             userService.deleteUser(userId);
+            userService.deleteUser(userId);
+            return new ResponseEntity<>(new MessageResponse("The user " + userId + " was deleted."), HttpStatus.OK);
         }
-        return new ResponseEntity<>(new MessageResponse("The user " + userId + " was deleted."), HttpStatus.OK);
+        return new ResponseEntity<>(new MessageResponse("Not enough rights to delete user."), HttpStatus.UNAUTHORIZED);
     }
 }
