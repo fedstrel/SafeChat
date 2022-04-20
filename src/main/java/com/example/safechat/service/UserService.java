@@ -12,9 +12,11 @@ import com.example.safechat.repository.IMessageRepository;
 import com.example.safechat.repository.IUserPresenceRepository;
 import com.example.safechat.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,5 +89,9 @@ public class UserService {
 
     public User getUserByMessage(Long mesId) {
         return messageRepository.getById(mesId).getUser();
+    }
+
+    public User getCurrentUser() {
+        return (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

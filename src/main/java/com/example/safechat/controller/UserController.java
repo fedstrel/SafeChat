@@ -6,6 +6,7 @@ import com.example.safechat.facade.UserFacade;
 import com.example.safechat.payload.response.MessageResponse;
 import com.example.safechat.service.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -22,8 +23,15 @@ import java.util.stream.Collectors;
 @RequestMapping("/user")
 public class UserController {
 
+    @Autowired
     private final UserService userService;
+    @Autowired
     private final UserFacade userFacade;
+
+    @GetMapping("/cur")
+    public ResponseEntity<UserDTO> getCurrentUser() {
+        return  new ResponseEntity<>(userFacade.userToUserDTO(userService.getCurrentUser()), HttpStatus.OK);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
