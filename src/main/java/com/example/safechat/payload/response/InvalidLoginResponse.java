@@ -1,8 +1,8 @@
 package com.example.safechat.payload.response;
 
 public class InvalidLoginResponse {
-    private String username;
-    private String password;
+    final private String username;
+    final private String password;
 
     public InvalidLoginResponse() {
         this.username = "Invalid username";

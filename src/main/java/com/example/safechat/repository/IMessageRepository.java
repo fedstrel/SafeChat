@@ -13,5 +13,4 @@ import java.util.Optional;
 public interface IMessageRepository extends JpaRepository<Message, Long> {
     Optional<List<Message>> findAllByRoomId(Long roomId);
     Optional<Page<Message>> findAllByRoomId(Long roomId, Pageable pageable);
-    Optional<List<Message>> findAllByRoomIdAndText(Long roomId, String text);
 }

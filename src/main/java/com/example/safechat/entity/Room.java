@@ -1,7 +1,6 @@
 package com.example.safechat.entity;
 
 import com.example.safechat.entity.enums.EPublicityType;
-import com.example.safechat.entity.enums.ERole;
 import com.example.safechat.entity.enums.ERoomType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
@@ -9,9 +8,7 @@ import lombok.Data;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @Entity

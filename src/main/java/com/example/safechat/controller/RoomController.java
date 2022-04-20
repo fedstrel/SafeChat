@@ -83,4 +83,14 @@ public class RoomController {
             return new ResponseEntity<>(new RoomDTO(), HttpStatus.UNAUTHORIZED);
         return new ResponseEntity<>(roomFacade.roomToRoomDTO(room), HttpStatus.OK);
     }
+
+    @PostMapping("/leave/{roomId}")
+    public ResponseEntity<MessageResponse> leaveRoom(@PathVariable Long roomId) {
+        try {
+            roomService.leaveRoom(roomId);
+            return new ResponseEntity<>(new MessageResponse("Room has been successfully left."), HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
 }

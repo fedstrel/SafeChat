@@ -7,10 +7,12 @@ import com.example.safechat.entity.UserPresence;
 import com.example.safechat.entity.enums.ERoomRole;
 import com.example.safechat.exception.PresenceNotFoundException;
 import com.example.safechat.exception.RoomNotFoundException;
+import com.example.safechat.exception.UserNotFoundException;
 import com.example.safechat.repository.IRoomRepository;
 import com.example.safechat.repository.IUserPresenceRepository;
 import com.example.safechat.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -87,6 +89,14 @@ public class RoomService {
         Room room = roomRepository.getById(roomId);
         room.addPresencesToUserPresenceList(presences);
         return room;
+    }
+
+    public void leaveRoom(Long roomId) {
+        User user = userRepository.findUserByUsername(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString())
+                .orElseThrow(() -> new UserNotFoundException("User is not found."));
+        UserPresence presence = userPresenceRepository.findByRoomIdAndUserId(roomId, user.getId())
+                .orElseThrow(() -> new UserNotFoundException("User is not present in the room."));
+        userPresenceRepository.delete(presence);
     }
 
     public Room deleteUsersFromRoom(List<Long> userIds, Long roomId, Long userAuthorId) {
