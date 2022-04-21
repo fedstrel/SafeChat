@@ -5,13 +5,18 @@ import com.example.safechat.entity.Room;
 import com.example.safechat.facade.RoomFacade;
 import com.example.safechat.payload.response.MessageResponse;
 import com.example.safechat.service.RoomService;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import net.minidev.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @CrossOrigin
 @RestController
@@ -70,15 +75,15 @@ public class RoomController {
     }
 
     @PostMapping("/add/{id}")
-    public ResponseEntity<RoomDTO> addUsersToRoom(@RequestBody List<Long> userIds, @PathVariable Long id) {
-        return new ResponseEntity<>(roomFacade.roomToRoomDTO(roomService.addUsersToRoom(userIds, id)), HttpStatus.OK);
+    public ResponseEntity<RoomDTO> addUsersToRoom(@RequestBody JsonArray userIds, @PathVariable Long id) {
+        return new ResponseEntity<>(roomFacade.roomToRoomDTO(roomService.addUsersToRoom(JsonArrayToListLong(userIds), id)), HttpStatus.OK);
     }
 
     @PostMapping("/delete/{id}/user/{userId}")
-    public ResponseEntity<RoomDTO> deleteUsersFromRoom(@RequestBody List<Long> userIds,
+    public ResponseEntity<RoomDTO> deleteUsersFromRoom(@RequestBody JsonArray userIds,
                                                        @PathVariable Long id,
                                                        @PathVariable Long userId) {
-        Room room = roomService.deleteUsersFromRoom(userIds, id, userId);
+        Room room = roomService.deleteUsersFromRoom(JsonArrayToListLong(userIds), id, userId);
         if (room == null)
             return new ResponseEntity<>(new RoomDTO(), HttpStatus.UNAUTHORIZED);
         return new ResponseEntity<>(roomFacade.roomToRoomDTO(room), HttpStatus.OK);
@@ -92,5 +97,14 @@ public class RoomController {
         } catch (RuntimeException e) {
             return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    private List<Long> JsonArrayToListLong(JsonArray array) {
+        List<Long> list = new ArrayList<>();
+        for (JsonElement elem:
+                array) {
+            list.add(elem.getAsLong());
+        }
+        return list;
     }
 }

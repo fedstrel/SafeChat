@@ -122,7 +122,7 @@ public class RoomService {
         List<Room> rooms = new ArrayList<>();
         for (UserPresence presence:
                 presences) {
-            rooms.add(roomRepository.getById(presence.getUser().getId()));
+            rooms.add(roomRepository.getById(presence.getRoom().getId()));
         }
         return rooms;
     }

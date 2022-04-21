@@ -1,7 +1,9 @@
 package com.example.safechat.entity;
 
 import com.example.safechat.entity.enums.ERoomRole;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -21,10 +23,10 @@ public class UserPresence {
 
     private ERoomRole role;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Room room;
 
     public UserPresence() { }

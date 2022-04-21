@@ -9,6 +9,7 @@ import com.example.safechat.repository.IRoomRepository;
 import com.example.safechat.repository.IUserRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -39,7 +40,7 @@ public class MessageService {
     {
         Message message = new Message();
         message.setText(messageDTO.getText());
-        message.setCreationDate(messageDTO.getCreationDate());
+        message.setCreationDate(LocalDateTime.now());
         message.setFiles(messageDTO.getFiles());
 
         message.setUser(userRepository.getById(userId));

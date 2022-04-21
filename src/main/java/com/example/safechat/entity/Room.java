@@ -3,6 +3,8 @@ package com.example.safechat.entity;
 import com.example.safechat.entity.enums.EPublicityType;
 import com.example.safechat.entity.enums.ERoomType;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -13,6 +15,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name="rooms")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "userPresenceList", "messages"})
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
