@@ -62,7 +62,7 @@ public class RoomService {
     }
 
     public boolean deleteRoom(Long roomId, Long userId) {
-        if (isUserAdminOfRoom(userId, roomId))
+        if (!isUserAdminOfRoom(userId, roomId))
             return false;
         Room room = roomRepository.getById(roomId);
         Optional<List<UserPresence>> presences = userPresenceRepository.findAllByRoomId(roomId);
@@ -92,8 +92,7 @@ public class RoomService {
     }
 
     public void leaveRoom(Long roomId) {
-        User user = userRepository.findUserByUsername(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString())
-                .orElseThrow(() -> new UserNotFoundException("User is not found."));
+        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserPresence presence = userPresenceRepository.findByRoomIdAndUserId(roomId, user.getId())
                 .orElseThrow(() -> new UserNotFoundException("User is not present in the room."));
         userPresenceRepository.delete(presence);
@@ -144,8 +143,9 @@ public class RoomService {
                 .orElseThrow(() -> new RoomNotFoundException("Room not found."));
    }
 
-   private boolean isUserAdminOfRoom(Long userId, Long roomId) {
-       Optional<UserPresence> userAuthorPresence = userPresenceRepository.findByRoomIdAndUserId(roomId, userId);
-       return userAuthorPresence.isEmpty() || userAuthorPresence.get().getRole() != ERoomRole.ROOM_ROLE_ADMIN;
+   public boolean isUserAdminOfRoom(Long userId, Long roomId) {
+       UserPresence userAuthorPresence = userPresenceRepository.findByRoomIdAndUserId(roomId, userId)
+               .orElseThrow(() -> new UserNotFoundException("user not found"));
+       return userAuthorPresence.getRole() == ERoomRole.ROOM_ROLE_ADMIN;
    }
 }

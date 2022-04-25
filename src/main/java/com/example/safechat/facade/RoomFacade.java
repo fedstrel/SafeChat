@@ -10,6 +10,7 @@ public class RoomFacade {
         RoomDTO roomDTO = new RoomDTO();
         roomDTO.setId(room.getId());
         roomDTO.setRoomType(room.getRoomType());
+        roomDTO.setCreationDate(room.getCreateDate());
         roomDTO.setName(room.getName());
         roomDTO.setPublicityType(room.getPublicityType());
         return roomDTO;

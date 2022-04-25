@@ -1,16 +1,16 @@
 package com.example.safechat.entity;
 
 import com.example.safechat.entity.enums.ERoomRole;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name="user_presence")
 public class UserPresence {
     @Id

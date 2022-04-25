@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
+@CrossOrigin
 @Controller
 @RequestMapping("/user")
 public class UserController {
@@ -29,8 +30,8 @@ public class UserController {
     private final UserFacade userFacade;
 
     @GetMapping("/cur")
-    public ResponseEntity<UserDTO> getCurrentUser() {
-        return  new ResponseEntity<>(userFacade.userToUserDTO(userService.getCurrentUser()), HttpStatus.OK);
+    public ResponseEntity<UserSecDTO> getCurrentUser() {
+        return new ResponseEntity<>(userFacade.userToUserSecDTO(userService.getCurrentUser()), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -65,5 +66,11 @@ public class UserController {
             return new ResponseEntity<>(new MessageResponse("The user " + userId + " was deleted."), HttpStatus.OK);
         }
         return new ResponseEntity<>(new MessageResponse("Not enough rights to delete user."), HttpStatus.UNAUTHORIZED);
+    }
+
+    @PostMapping("/cur/delete")
+    public ResponseEntity<MessageResponse> deleteCurUser() {
+        userService.deleteUser(userService.getCurrentUser().getId());
+        return new ResponseEntity<>(new MessageResponse("User has been deleted"), HttpStatus.OK);
     }
 }

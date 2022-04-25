@@ -99,6 +99,12 @@ public class RoomController {
         }
     }
 
+    @GetMapping("/user/{userId}/admin/{roomId}")
+    public ResponseEntity<Boolean> isUserAdminOfTheRoom(@PathVariable Long roomId,
+                                                        @PathVariable Long userId) {
+        return new ResponseEntity<>(roomService.isUserAdminOfRoom(userId, roomId), HttpStatus.OK);
+    }
+
     private List<Long> JsonArrayToListLong(JsonArray array) {
         List<Long> list = new ArrayList<>();
         for (JsonElement elem:
