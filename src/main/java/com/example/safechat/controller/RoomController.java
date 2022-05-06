@@ -75,8 +75,8 @@ public class RoomController {
     }
 
     @PostMapping("/add/{id}")
-    public ResponseEntity<RoomDTO> addUsersToRoom(@RequestBody JsonArray userIds, @PathVariable Long id) {
-        return new ResponseEntity<>(roomFacade.roomToRoomDTO(roomService.addUsersToRoom(JsonArrayToListLong(userIds), id)), HttpStatus.OK);
+    public ResponseEntity<RoomDTO> addUsersToRoom(@RequestBody List<Long> userIds, @PathVariable Long id) {
+        return new ResponseEntity<>(roomFacade.roomToRoomDTO(roomService.addUsersToRoom(userIds, id)), HttpStatus.OK);
     }
 
     @PostMapping("/delete/{id}/user/{userId}")
@@ -103,6 +103,12 @@ public class RoomController {
     public ResponseEntity<Boolean> isUserAdminOfTheRoom(@PathVariable Long roomId,
                                                         @PathVariable Long userId) {
         return new ResponseEntity<>(roomService.isUserAdminOfRoom(userId, roomId), HttpStatus.OK);
+    }
+
+    @GetMapping("/user/{userId}/present/{roomId}")
+    public ResponseEntity<Boolean> isUserPresentInTheRoom(@PathVariable Long roomId,
+                                                        @PathVariable Long userId) {
+        return new ResponseEntity<>(roomService.isUserPresentInTheRoom(userId, roomId), HttpStatus.OK);
     }
 
     private List<Long> JsonArrayToListLong(JsonArray array) {

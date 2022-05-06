@@ -85,7 +85,6 @@ public class RoomService {
             user.getUserPresenceList().add(presence);
             userRepository.save(user);
         }
-        userPresenceRepository.saveAll(presences);
         Room room = roomRepository.getById(roomId);
         room.addPresencesToUserPresenceList(presences);
         return room;
@@ -147,5 +146,10 @@ public class RoomService {
        UserPresence userAuthorPresence = userPresenceRepository.findByRoomIdAndUserId(roomId, userId)
                .orElseThrow(() -> new UserNotFoundException("user not found"));
        return userAuthorPresence.getRole() == ERoomRole.ROOM_ROLE_ADMIN;
+   }
+
+   public boolean isUserPresentInTheRoom(Long userId, Long roomId) {
+       Optional<UserPresence> userAuthorPresence = userPresenceRepository.findByRoomIdAndUserId(roomId, userId);
+       return userAuthorPresence.isPresent();
    }
 }

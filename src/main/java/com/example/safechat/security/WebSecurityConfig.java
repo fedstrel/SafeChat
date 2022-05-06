@@ -16,6 +16,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.session.SessionManagementFilter;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -30,16 +34,29 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     ConfigUserDetailsService configUserDetailsService;
 
+    private CorsConfiguration configCors() {
+        CorsConfiguration conf = new CorsConfiguration().applyPermitDefaultValues();
+        conf.addAllowedOriginPattern("http://localhost:4200*");
+        return conf;
+    }
+
+    @Bean()
+    CORSFilter createFilter() {
+        return new CORSFilter();
+    }
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable()
+        http.addFilterBefore(createFilter(), SessionManagementFilter.class);
+        http.cors()
+                .and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+                .headers().frameOptions().sameOrigin().and()
                 .authorizeRequests()
                 .antMatchers(SecurityConstants.SIGN_UP_URLS).permitAll()
-                .anyRequest().authenticated();
+                .anyRequest().permitAll(); //don't forget!!!
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }

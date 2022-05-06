@@ -76,6 +76,11 @@ public class UserService {
         return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found."));
     }
 
+    public List<User> getAllUsersContainingNameAndNotInTheRoom(String name, Long roomId) {
+        return userRepository.findAllContainingNameAndNotInTheRoom(name, roomId)
+                .orElseThrow(() -> new UserNotFoundException("user not found"));
+    }
+
     public List<User> getAllUsersForRoom(Long roomId) {
         List<UserPresence> presences = userPresenceRepository.findAllByRoomId(roomId)
                 .orElseThrow(() -> new PresenceNotFoundException("Presence not found."));

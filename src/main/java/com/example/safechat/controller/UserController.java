@@ -53,6 +53,16 @@ public class UserController {
         return new ResponseEntity<>(userDTOList, HttpStatus.OK);
     }
 
+    @GetMapping("/room/{roomId}/search={name}")
+    public ResponseEntity<List<UserDTO>> getAllUsersContainingNameAndNotInTheRoom(@PathVariable Long roomId,
+                                                                                  @PathVariable String name) {
+        List<UserDTO> userDTOList = userService.getAllUsersContainingNameAndNotInTheRoom(name, roomId)
+                .stream()
+                .map(userFacade::userToUserDTO)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(userDTOList, HttpStatus.OK);
+    }
+
     @PostMapping("/update")
     public ResponseEntity<UserSecDTO> updateUser(@Valid @RequestBody UserSecDTO userSecDTO) {
         return new ResponseEntity<>(userFacade.userToUserSecDTO(userService.updateUser(userSecDTO)), HttpStatus.OK);
