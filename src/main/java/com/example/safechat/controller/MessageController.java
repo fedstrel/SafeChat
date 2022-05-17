@@ -26,8 +26,10 @@ public class MessageController {
     @Autowired
     private MessageFacade messageFacade;
 
-    @GetMapping("/room/{roomId}")
-    public ResponseEntity<Page<Message>> getMessagesByRoomPageable(@PathVariable Long roomId, PageDTO pageDTO) {
+    @GetMapping("/room/{roomId}/page={pageNum}")
+    public ResponseEntity<Page<Message>> getMessagesByRoomPageable(@PathVariable Long roomId, @PathVariable int pageNum) {
+        PageDTO pageDTO = new PageDTO();
+        pageDTO.setPageNumber(pageNum);
         Page<Message> page = new PageImpl<>(messageService.getMessagesByRoomPageable(roomId, pageDTO));
         return new ResponseEntity<>(page, HttpStatus.OK);
     }
@@ -35,13 +37,5 @@ public class MessageController {
     @GetMapping("/room/all/{roomId}")
     public ResponseEntity<List<Message>> getAllMessagesByRoom(@PathVariable Long roomId) {
         return new ResponseEntity<>(messageService.getAllMessagesByRoom(roomId), HttpStatus.OK);
-    }
-
-    @PostMapping("/create/{roomId}/{userId}")
-    public ResponseEntity<MessageDTO> createMessage(@PathVariable Long roomId,
-                                                    @PathVariable Long userId,
-                                                    @RequestBody MessageDTO messageDTO) {
-        Message message = messageService.createMessage(roomId, userId, messageDTO);
-        return new ResponseEntity<>(messageFacade.messageToMessageDTO(message), HttpStatus.CREATED);
     }
 }

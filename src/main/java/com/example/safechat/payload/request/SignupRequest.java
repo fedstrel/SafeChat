@@ -32,4 +32,6 @@ public class SignupRequest {
 
     @NotEmpty(message = "Please enter your password again")
     private String confirmPassword;
+
+    private String info;
 }

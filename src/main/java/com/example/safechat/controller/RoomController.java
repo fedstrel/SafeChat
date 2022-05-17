@@ -1,7 +1,9 @@
 package com.example.safechat.controller;
 
 import com.example.safechat.dto.RoomDTO;
+import com.example.safechat.dto.WSMessageDTO;
 import com.example.safechat.entity.Room;
+import com.example.safechat.exception.PresenceNotFoundException;
 import com.example.safechat.facade.RoomFacade;
 import com.example.safechat.payload.response.MessageResponse;
 import com.example.safechat.service.RoomService;
@@ -80,13 +82,17 @@ public class RoomController {
     }
 
     @PostMapping("/delete/{id}/user/{userId}")
-    public ResponseEntity<RoomDTO> deleteUsersFromRoom(@RequestBody JsonArray userIds,
+    public ResponseEntity<WSMessageDTO> deleteUsersFromRoom(@RequestBody List<Long> userIds,
                                                        @PathVariable Long id,
                                                        @PathVariable Long userId) {
-        Room room = roomService.deleteUsersFromRoom(JsonArrayToListLong(userIds), id, userId);
-        if (room == null)
-            return new ResponseEntity<>(new RoomDTO(), HttpStatus.UNAUTHORIZED);
-        return new ResponseEntity<>(roomFacade.roomToRoomDTO(room), HttpStatus.OK);
+        try {
+            Room room = roomService.deleteUsersFromRoom(userIds, id, userId);
+            if (room == null)
+                return new ResponseEntity<>(new WSMessageDTO("No right to delete from this room", ""), HttpStatus.OK);
+            return new ResponseEntity<>(new WSMessageDTO("Users were deleted.", ""), HttpStatus.OK);
+        } catch (PresenceNotFoundException e) {
+            return new ResponseEntity<>(new WSMessageDTO(e.getMessage(), ""), HttpStatus.OK);
+        }
     }
 
     @PostMapping("/leave/{roomId}")
@@ -109,14 +115,5 @@ public class RoomController {
     public ResponseEntity<Boolean> isUserPresentInTheRoom(@PathVariable Long roomId,
                                                         @PathVariable Long userId) {
         return new ResponseEntity<>(roomService.isUserPresentInTheRoom(userId, roomId), HttpStatus.OK);
-    }
-
-    private List<Long> JsonArrayToListLong(JsonArray array) {
-        List<Long> list = new ArrayList<>();
-        for (JsonElement elem:
-                array) {
-            list.add(elem.getAsLong());
-        }
-        return list;
     }
 }

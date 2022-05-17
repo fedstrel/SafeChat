@@ -5,6 +5,7 @@ import com.example.safechat.entity.User;
 import com.example.safechat.entity.UserPresence;
 import com.example.safechat.entity.enums.ERole;
 import com.example.safechat.exception.PresenceNotFoundException;
+import com.example.safechat.exception.RoomNotFoundException;
 import com.example.safechat.exception.UserAlreadyExistsException;
 import com.example.safechat.exception.UserNotFoundException;
 import com.example.safechat.payload.request.SignupRequest;
@@ -49,6 +50,7 @@ public class UserService {
         user.setUsername(signupRequestRequest.getUsername());
         user.setPassword(bCryptPasswordEncoder.encode(signupRequestRequest.getPassword()));
         user.setRole(ERole.ROLE_USER);
+        user.setInfo(signupRequestRequest.getInfo());
         return userRepository.save(user);
     }
 
@@ -83,7 +85,7 @@ public class UserService {
 
     public List<User> getAllUsersForRoom(Long roomId) {
         List<UserPresence> presences = userPresenceRepository.findAllByRoomId(roomId)
-                .orElseThrow(() -> new PresenceNotFoundException("Presence not found."));
+                .orElseThrow(() -> new RoomNotFoundException("Room not found."));
         List<User> users = new ArrayList<>();
         for (UserPresence presence:
                 presences) {

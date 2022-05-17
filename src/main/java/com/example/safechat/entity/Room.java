@@ -46,4 +46,9 @@ public class Room {
         userPresenceList.addAll(presences);
         return userPresenceList;
     }
+
+    @Override
+    public String toString() {
+        return id + " " + name;
+    }
 }

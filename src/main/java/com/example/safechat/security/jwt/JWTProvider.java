@@ -25,7 +25,7 @@ public class JWTProvider {
         String usersId = Long.toString(user.getId());
         Map<String, Object> claimsMap = new HashMap<>();
         claimsMap.put("id", usersId);
-        claimsMap.put("username", user.getEmail());
+        claimsMap.put("username", user.getUsername());
         claimsMap.put("firstname", user.getFirstname());
         claimsMap.put("lastname", user.getLastname());
 

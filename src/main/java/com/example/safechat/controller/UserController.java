@@ -2,8 +2,10 @@ package com.example.safechat.controller;
 
 import com.example.safechat.dto.UserDTO;
 import com.example.safechat.dto.UserSecDTO;
+import com.example.safechat.exception.RoomNotFoundException;
 import com.example.safechat.facade.UserFacade;
 import com.example.safechat.payload.response.MessageResponse;
+import com.example.safechat.service.RoomService;
 import com.example.safechat.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,11 +48,15 @@ public class UserController {
 
     @GetMapping("/room/{roomId}")
     public ResponseEntity<List<UserDTO>> getAllUsersForRoom(@PathVariable Long roomId) {
-        List<UserDTO> userDTOList = userService.getAllUsersForRoom(roomId)
-                .stream()
-                .map(userFacade::userToUserDTO)
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(userDTOList, HttpStatus.OK);
+        try {
+            List<UserDTO> userDTOList = userService.getAllUsersForRoom(roomId)
+                    .stream()
+                    .map(userFacade::userToUserDTO)
+                    .collect(Collectors.toList());
+            return new ResponseEntity<>(userDTOList, HttpStatus.OK);
+        } catch (RoomNotFoundException e) {
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        }
     }
 
     @GetMapping("/room/{roomId}/search={name}")

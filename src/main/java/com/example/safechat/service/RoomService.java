@@ -98,14 +98,14 @@ public class RoomService {
     }
 
     public Room deleteUsersFromRoom(List<Long> userIds, Long roomId, Long userAuthorId) {
-        if (isUserAdminOfRoom(userAuthorId, roomId))
+        if (!isUserAdminOfRoom(userAuthorId, roomId))
             return null;
         Room room = roomRepository.getById(roomId);
         List<UserPresence> presences = room.getUserPresenceList();
         for (Long userId:
              userIds) {
             UserPresence presence = userPresenceRepository.findByRoomIdAndUserId(roomId, userId)
-                    .orElseThrow(() -> new PresenceNotFoundException("UserPresence for user with id=" + userId + "not found."));
+                    .orElseThrow(() -> new PresenceNotFoundException("UserPresence for user with id=" + userId + " not found."));
              userPresenceRepository.delete(presence);
             presences.remove(presence);
         }

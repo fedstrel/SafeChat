@@ -24,4 +24,8 @@ public class WSMessageController {
         messageService.createMessage(Long.parseLong(roomId), Long.parseLong(wsMessageDTO.getSenderId()), message);
         simpMessagingTemplate.convertAndSend("/topic/messages/" + roomId, wsMessageDTO);
     }
+    @MessageMapping("/chat/user/{userId}")
+    public void notifyUser(@DestinationVariable String userId) {
+        simpMessagingTemplate.convertAndSend("/topic/notification/" + userId, new WSMessageDTO("", ""));
+    }
 }
