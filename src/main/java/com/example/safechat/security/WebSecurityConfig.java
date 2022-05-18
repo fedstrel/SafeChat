@@ -17,9 +17,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.session.SessionManagementFilter;
-import org.springframework.web.cors.CorsConfiguration;
-
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -33,12 +30,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     @Autowired
     ConfigUserDetailsService configUserDetailsService;
-
-    private CorsConfiguration configCors() {
-        CorsConfiguration conf = new CorsConfiguration().applyPermitDefaultValues();
-        conf.addAllowedOriginPattern("http://localhost:4200*");
-        return conf;
-    }
 
     @Bean()
     CORSFilter createFilter() {

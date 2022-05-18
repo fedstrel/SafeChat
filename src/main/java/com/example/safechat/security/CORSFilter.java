@@ -9,9 +9,7 @@ import java.util.List;
 
 public class CORSFilter implements Filter {
 
-    // This is to be replaced with a list of domains allowed to access the server
-    //You can include more than one origin here
-    private final List<String> allowedOrigins = Arrays.asList("http://localhost:4200");
+    private final List<String> allowedOrigins = Arrays.asList("http://localhost:4200", "https://vast-everglades-61393.herokuapp.com");
 
     public void destroy() {
 
