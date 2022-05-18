@@ -38,6 +38,8 @@ public class MessageService {
 
     public Message createMessage(Long roomId, Long userId, MessageDTO messageDTO)
     {
+        if (messageDTO.getText().length() == 0)
+            return null;
         Message message = new Message();
         message.setText(messageDTO.getText());
         message.setCreationDate(LocalDateTime.now());
