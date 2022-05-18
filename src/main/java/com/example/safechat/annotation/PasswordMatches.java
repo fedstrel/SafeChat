@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = PasswordMatchesValidator.class)
 @Documented
 public @interface PasswordMatches {
-    String message() default "Invalid email";
+    String message() default "Passwords should match";
 
     Class<?>[] groups() default{};
 

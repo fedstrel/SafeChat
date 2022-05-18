@@ -12,6 +12,8 @@ import com.example.safechat.payload.request.SignupRequest;
 import com.example.safechat.repository.IMessageRepository;
 import com.example.safechat.repository.IUserPresenceRepository;
 import com.example.safechat.repository.IUserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,6 +26,7 @@ import java.util.List;
 
 @Service
 public class UserService {
+    public static final Logger LOG = LoggerFactory.getLogger(UserService.class);
     private final IMessageRepository messageRepository;
     private final IUserRepository userRepository;
     private final IUserPresenceRepository userPresenceRepository;
@@ -41,8 +44,10 @@ public class UserService {
     }
 
     public User createUser(SignupRequest signupRequestRequest) {
-        if (userRepository.findUserByUsername(signupRequestRequest.getUsername()).isPresent())
+        if (userRepository.findUserByUsername(signupRequestRequest.getUsername()).isPresent()) {
+            LOG.info("Failed to create a user. Entered username is already in use");
             throw new UserAlreadyExistsException("Entered username is already in use");
+        }
         User user = new User();
         user.setEmail(signupRequestRequest.getEmail());
         user.setFirstname(signupRequestRequest.getFirstname());
@@ -51,6 +56,9 @@ public class UserService {
         user.setPassword(bCryptPasswordEncoder.encode(signupRequestRequest.getPassword()));
         user.setRole(ERole.ROLE_USER);
         user.setInfo(signupRequestRequest.getInfo());
+        user.setCreateDate(LocalDateTime.now());
+
+        LOG.info("User " + user.getFirstname() + " " + user.getLastname() + " with username=" + user.getUsername() + " created");
         return userRepository.save(user);
     }
 
@@ -66,12 +74,15 @@ public class UserService {
         user.setPassword(userSecDTO.getPassword());
         user.setRole(userSecDTO.getRole());
         user.setCreateDate(LocalDateTime.now());
+
+        LOG.info("User " + user.getFirstname() + " " + user.getLastname() + " with username=" + user.getUsername() + " updated");
         return userRepository.save(user);
     }
 
     public void deleteUser(Long userId) {
         User user = userRepository.getById(userId);
         userRepository.delete(user);
+        LOG.info("User " + user.getFirstname() + " " + user.getLastname() + " with username=" + user.getUsername() + " deleted");
     }
 
     public User getUserById(Long userId) {

@@ -11,6 +11,8 @@ import com.example.safechat.exception.UserNotFoundException;
 import com.example.safechat.repository.IRoomRepository;
 import com.example.safechat.repository.IUserPresenceRepository;
 import com.example.safechat.repository.IUserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ import java.util.Optional;
 
 @Service
 public class RoomService {
+    public static final Logger LOG = LoggerFactory.getLogger(RoomService.class);
     private final IRoomRepository roomRepository;
     private final IUserRepository userRepository;
     private final IUserPresenceRepository userPresenceRepository;
@@ -47,7 +50,7 @@ public class RoomService {
         room.setRoomType(dto.getRoomType());
         room.setCreateDate(LocalDateTime.now());
         room = roomRepository.save(room);
-
+        LOG.info("Created a room called " + room.getName());
         //connecting a room to other entities in the database
         UserPresence presence = new UserPresence();
         presence.setRoom(room);
@@ -55,6 +58,7 @@ public class RoomService {
         presence.setRole(ERoomRole.ROOM_ROLE_ADMIN);
         presence.setJoinDate(room.getCreateDate());
         userPresenceRepository.save(presence);
+        LOG.info("Added a user with userId=" + userId + " to room called " + room.getName());
 
         //saving connected room
         room.addPresenceToUserPresenceList(presence);
@@ -62,12 +66,15 @@ public class RoomService {
     }
 
     public boolean deleteRoom(Long roomId, Long userId) {
-        if (!isUserAdminOfRoom(userId, roomId))
+        if (!isUserAdminOfRoom(userId, roomId)) {
+            LOG.info("Deletion refused due to the lack of rights.");
             return false;
+        }
         Room room = roomRepository.getById(roomId);
         Optional<List<UserPresence>> presences = userPresenceRepository.findAllByRoomId(roomId);
         roomRepository.delete(room);
         presences.ifPresent((userPresenceRepository::deleteAll));
+        LOG.info("Room called " + room.getName() + " with id=" + roomId + " was deleted.");
         return true;
     }
 
@@ -84,6 +91,7 @@ public class RoomService {
             User user = userRepository.getById(userId);
             user.getUserPresenceList().add(presence);
             userRepository.save(user);
+            LOG.info("User with id=" + userId + " has been added to the room with id=" + roomId);
         }
         Room room = roomRepository.getById(roomId);
         room.addPresencesToUserPresenceList(presences);
@@ -95,6 +103,7 @@ public class RoomService {
         UserPresence presence = userPresenceRepository.findByRoomIdAndUserId(roomId, user.getId())
                 .orElseThrow(() -> new UserNotFoundException("User is not present in the room."));
         userPresenceRepository.delete(presence);
+        LOG.info("User with id=" + user.getId() + " has left the room with id=" + roomId);
     }
 
     public Room deleteUsersFromRoom(List<Long> userIds, Long roomId, Long userAuthorId) {
@@ -106,14 +115,14 @@ public class RoomService {
              userIds) {
             UserPresence presence = userPresenceRepository.findByRoomIdAndUserId(roomId, userId)
                     .orElseThrow(() -> new PresenceNotFoundException("UserPresence for user with id=" + userId + " not found."));
-             userPresenceRepository.delete(presence);
+            userPresenceRepository.delete(presence);
             presences.remove(presence);
+            LOG.info("User with id=" + userId + " has been deleted from the room with roomId=" + roomId);
         }
         roomRepository.save(room);
         return room;
     }
 
-    //vulnerability: can drop when one room is being deleted while querying others
     public List<Room> getAllRoomsForUser(Long userId) {
         List<UserPresence> presences = userPresenceRepository.findAllByUserId(userId)
                 .orElseThrow(() -> new PresenceNotFoundException("Presence not found."));
@@ -125,7 +134,6 @@ public class RoomService {
         return rooms;
     }
 
-    //vulnerability: can drop when one room is being deleted while querying others
     public List<Room> getAllRoomsByUserContainingName(Long userId, String name) {
         List<Room> rooms = getAllRoomsForUser(userId);
         List<Room> resRooms = new ArrayList<>();

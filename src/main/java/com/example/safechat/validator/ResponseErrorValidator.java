@@ -17,8 +17,10 @@ public class ResponseErrorValidator {
         if (bindingResult.hasErrors()) {
             Map<String, String> errorMap = new HashMap<>();
             if (!CollectionUtils.isEmpty(bindingResult.getAllErrors())) {
+                int i = 0;
                 for (ObjectError error : bindingResult.getAllErrors()) {
-                    errorMap.put(error.getCode(), error.getDefaultMessage());
+                    errorMap.put("message_" + i, error.getDefaultMessage());
+                    i++;
                 }
             }
 
