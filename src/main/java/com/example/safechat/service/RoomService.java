@@ -115,11 +115,12 @@ public class RoomService {
              userIds) {
             UserPresence presence = userPresenceRepository.findByRoomIdAndUserId(roomId, userId)
                     .orElseThrow(() -> new PresenceNotFoundException("UserPresence for user with id=" + userId + " not found."));
-            userPresenceRepository.delete(presence);
             presences.remove(presence);
+            room.setUserPresenceList(presences);
+            roomRepository.save(room);
+            userPresenceRepository.delete(presence);
             LOG.info("User with id=" + userId + " has been deleted from the room with roomId=" + roomId);
         }
-        roomRepository.save(room);
         return room;
     }
 
@@ -150,14 +151,34 @@ public class RoomService {
                 .orElseThrow(() -> new RoomNotFoundException("Room not found."));
    }
 
+    public List<Room> getPublicRoomsThatAreNotVisited(Long userId) {
+        List<Room> rooms = roomRepository.findAllByUserIdAndPublicityType(userId)
+                .orElseThrow(() -> new RoomNotFoundException("Rooms were not found"));
+        List<Room> resRooms = new ArrayList<>();
+        for (Room room: rooms) {
+            if (!presenceListContainsUserId(room.getUserPresenceList(), userId)) {
+                resRooms.add(room);
+            }
+        }
+        return resRooms;
+    }
+
    public boolean isUserAdminOfRoom(Long userId, Long roomId) {
        UserPresence userAuthorPresence = userPresenceRepository.findByRoomIdAndUserId(roomId, userId)
-               .orElseThrow(() -> new UserNotFoundException("user not found"));
+               .orElseThrow(() -> new UserNotFoundException("User not found"));
        return userAuthorPresence.getRole() == ERoomRole.ROOM_ROLE_ADMIN;
    }
 
    public boolean isUserPresentInTheRoom(Long userId, Long roomId) {
        Optional<UserPresence> userAuthorPresence = userPresenceRepository.findByRoomIdAndUserId(roomId, userId);
        return userAuthorPresence.isPresent();
+   }
+
+   private boolean presenceListContainsUserId(List<UserPresence> presenceList, Long userId) {
+        for (UserPresence presence: presenceList) {
+            if (presence.getUser().getId() == userId)
+                return true;
+        }
+        return false;
    }
 }

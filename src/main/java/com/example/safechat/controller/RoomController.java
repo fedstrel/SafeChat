@@ -116,4 +116,13 @@ public class RoomController {
                                                         @PathVariable Long userId) {
         return new ResponseEntity<>(roomService.isUserPresentInTheRoom(userId, roomId), HttpStatus.OK);
     }
+
+    @GetMapping("/user/{userId}/not-visited")
+    public ResponseEntity<List<RoomDTO>> getPublicRoomsThatAreNotVisited(@PathVariable Long userId) {
+        List<RoomDTO> dtoList = roomService.getPublicRoomsThatAreNotVisited(userId)
+                .stream()
+                .map(roomFacade::roomToRoomDTO)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(dtoList, HttpStatus.OK);
+    }
 }

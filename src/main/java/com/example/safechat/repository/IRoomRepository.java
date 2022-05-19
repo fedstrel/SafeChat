@@ -13,4 +13,7 @@ import java.util.Optional;
 public interface IRoomRepository extends JpaRepository<Room, Long> {
     @Query("SELECT r FROM Room r WHERE r.publicityType = 0 AND r.name LIKE %:name%")
     Optional<List<Room>> findAllContainingName(@Param("name") String name);
+
+    @Query("SELECT r FROM Room r WHERE r.publicityType = 0")
+    Optional<List<Room>> findAllByUserIdAndPublicityType(@Param("userID") Long userId);
 }
